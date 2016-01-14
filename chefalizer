@@ -1,0 +1,17 @@
+#!/usr/bin/env python
+# Chefalizer
+
+import sys
+import elex, clex
+
+e = elex.Elex()
+
+e.build()
+#e.test("This is a sentence. Than another van. An owl. With the chef!")
+#print e.translate("This is a sentence. Then another van. An owl with a biscuit. With the chef!")
+
+with sys.stdin as fp:
+	for line in fp:
+		#print("in  >" + line + "<")
+		#print("out >" + e.translate(line) + "<")
+		sys.stdout.write(e.translate(line))
