@@ -1,4 +1,5 @@
 # English to Chef lexer
+# -*- coding: utf8 -*-
 
 import lex
 from ply.lex import TOKEN
@@ -18,18 +19,22 @@ class Elex(lex.Lex):
 		token.lexer.begin('inw')
 		return self.s(token)
 
-	def cw(self, token, a, b, c):
+	def cw(self, token, a, b, c, d=None):
 		if token.value[0] == a:
 			if self.lexer.current_state() == 'inw':
-				return None
-			token.value = b
+				if d is None:
+					return self.s(token)
+				else:
+					token.value = d
+			else:
+				token.value = b
 		else:
 			token.value = c
 		token.lexer.begin('inw')
 		return self.s(token)
 
 	def s(self, token):
-		m = self.lexer.lexmatch.groupdict()
+		m = token.lexer.lexmatch.groupdict()
 		if 'S' in m and m['S'] is not None:
 			token.value += m['S']
 		return token
@@ -60,6 +65,14 @@ class Elex(lex.Lex):
 		'DOT'
 	]
 
+	@TOKEN(b'[.!?]$')
+	def t_DOBORK(self, token):
+		token.lexer.begin('niw')
+		token.lexer.lineno += len(token.value)
+		self.seen_i = False
+		token.value = ". Bork bork bork" + token.value
+		return token
+
 	# Define a rule so we can track line numbers
 	@TOKEN(b'\\n+')
 	def t_newline(self, token):
@@ -68,6 +81,7 @@ class Elex(lex.Lex):
 		self.seen_i = False
 		return token
 
+	# Ignore obvious groff/nroff directives
 	@TOKEN(b'^\.[A-Za-z0-9][A-Za-z0-9]')
 	def t_nroff(self, token):
 		token.lexer.begin("niw")
@@ -79,28 +93,21 @@ class Elex(lex.Lex):
 		token.lexer.begin('niw')
 		return token
 
-	@TOKEN(b'[.!?]$')
-	def t_DOBORK(self, token):
-		token.lexer.begin('niw')
-		self.seen_i = False
-		self.token += ". Bork bork bork!"
-		return token
-
 	@TOKEN(b'[Bb]ork' + NW)
 	def t_niw_BORK(self, token):
 		return token
 
 	@TOKEN(b'[Aa]n' + WC)
 	def t_AN(self, token):
-		return self.cw(token, 'A', 'Un' ,'un')
+		return self.cw(token, 'A', 'Un' ,'un', 'UN')
 
 	@TOKEN(b'[Aa]u' + WC)
 	def t_AU(self, token):
-		return self.cw(token, 'A', 'Oo' ,'oo')
+		return self.cw(token, 'A', 'Oo' ,'oo', 'OO')
 
 	@TOKEN(b'[Aa]' + WC)
 	def t_A(self, token):
-		return self.cw(token, 'A', 'E' ,'e')
+		return self.cw(token, 'A', 'E' ,'e', 'E')
 
 	@TOKEN(b'en' + NW)
 	def t_EN(self, token):
@@ -116,7 +123,7 @@ class Elex(lex.Lex):
 
 	@TOKEN(b'[Ee]')
 	def t_niw_E(self, token):
-		return self.cw(token, 'E', 'I', 'i')
+		return self.cw(token, 'E', 'I', 'i', 'I')
 
 	@TOKEN(b'f')
 	def t_inw_F(self, token):
@@ -140,7 +147,7 @@ class Elex(lex.Lex):
 
 	@TOKEN(b'[Oo]')
 	def t_niw_O(self, token):
-		return self.cw(token, 'O', 'Oo', 'oo')
+		return self.cw(token, 'O', 'Oo', 'oo', 'OO')
 
 	@TOKEN(b'o')
 	def t_inw_O(self, token):
@@ -148,7 +155,7 @@ class Elex(lex.Lex):
 
 	@TOKEN(b'[Tt]he')
 	def t_THE(self, token):
-		return self.cw(token, 'T', 'Zee', 'zee')
+		return self.cw(token, 'T', 'Zee', 'zee', 'ZEE')
 
 	@TOKEN(b'th' + NW)
 	def t_TH(self, token):
@@ -160,15 +167,15 @@ class Elex(lex.Lex):
 
 	@TOKEN(b'[Uu]')
 	def t_inw_U(self, token):
-		return self.cw(token, 'U', 'Oo', 'oo')
+		return self.cw(token, 'U', 'Oo', 'oo', 'OO')
 
 	@TOKEN(b'[Vv]')
 	def t_V(self, token):
-		return self.cw(token, 'V', 'F', 'f')
+		return self.cw(token, 'V', 'F', 'f', 'F')
 
 	@TOKEN(b'[Ww]')
 	def t_W(self, token):
-		return self.cw(token, 'W', 'V', 'value')
+		return self.cw(token, 'W', 'V', 'v', 'V')
 
 	@TOKEN(b'.')
 	def t_DOT(self, token):
