@@ -2,7 +2,8 @@
 # Chefalizer
 
 import sys
-import elex, clex
+import pychefalizer.elex as elex
+import pychefalizer.clex as clex
 
 e = elex.Elex()
 
