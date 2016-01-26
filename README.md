@@ -1,13 +1,16 @@
 # Python Chefalizer
 
-More README coming soon!
+A Python implementation of the [Encheferizer](http://www.cs.utexas.edu/~jbc/home/chef.html).
 
-Pipe English into stdin and get Chefalized text out of it!
+This uses the PLY library (Python Lex Yacc) to use very similar semantics to the 
+original Encheferizer.
 
-# Example usage
+# Examples
+
+## Simple usage
 
 If you have some text, such as this excerpt from
-[Wikipedia](https://en.wikipedia.org/wiki/Swedish_Chef) in a file named `sample.txt`:
+[Wikipedia](https://en.wikipedia.org/wiki/Swedish_Chef), in a file named `sample.txt`:
 
 > A parody of television chefs, the Swedish Chef wears a toque blanche and has
 > bushy eyebrows that completely obscure his eyes. He was one of the few
@@ -35,7 +38,7 @@ If you have some text, such as this excerpt from
 > slapstick finale where the equipment or ingredients (usually a live
 > chicken/goat/cow etc.) get the better of him.
 
-Then executing `./chefalizer < sample.txt' would produce the following output:
+Then executing `./chefalizer < sample.txt` might produce the following output:
 
 > A perudy ooff telefeesiun cheffs, zee Svedish Cheff veers a tuqooe-a
 > blunche-a und hes booshy iyebroos thet cumpletely oobscoore-a his iyes.
@@ -67,4 +70,24 @@ Then executing `./chefalizer < sample.txt' would produce the following output:
 > iqooipment oor ingredients (usooelly a life-a chicken/guet/coo itc.)
 > get zee better ooff him. Bork bork bork.
 
+## Converting manual pages to Chef
+
+This example taken from MacOS; it'll be similar on other POSIX platforms.
+
+```bash
+zcat path-to-manpage.1.gz | \
+    chefalizer | \
+    tbl | \
+    groff -Wall -mtty-char -Tascii -mandoc -c | \
+    less
+
+```
+
+## Converting manual pages to Chef and HTML
+
+```bash
+zcat path-to-manpage.1.gz | \
+    chefalizer | \
+    man2html > /var/www/chef/out.html
+```
 
