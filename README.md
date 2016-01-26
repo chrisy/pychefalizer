@@ -72,6 +72,9 @@ Then executing `./chefalizer < sample.txt` might produce the following output:
 
 ## Converting manual pages to Chef
 
+The Chefalizer recognizes roff sequences and leaves them intact; this means
+you can easily Chefalize your man pages!
+
 This example taken from MacOS; it'll be similar on other POSIX platforms.
 
 ```bash

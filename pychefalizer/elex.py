@@ -19,18 +19,28 @@ class Elex(lex.Lex):
 		token.lexer.begin('inw')
 		return self.s(token)
 
-	def cw(self, token, a, b, c, d=None):
-		if token.value[0] == a:
-			if self.lexer.current_state() == 'inw':
-				if d is None:
-					return self.s(token)
-				else:
-					token.value = d
+	def mc(self, source, replacement):
+		if len(source) == 0 or len(replacement) == 0:
+			return ""
+
+		out = ""
+		i = 0
+		j = len(source) - 1
+
+		for c in replacement:
+			if source[i].isupper():
+				out += c.upper()
 			else:
-				token.value = b
-		else:
-			token.value = c
+				out += c.lower()
+
+			if i < j:
+				i += 1
+
+		return out
+
+	def cw(self, token, replacement):
 		token.lexer.begin('inw')
+		token.value = self.mc(token.value, replacement)
 		return self.s(token)
 
 	def s(self, token):
@@ -99,15 +109,15 @@ class Elex(lex.Lex):
 
 	@TOKEN(b'[Aa]n' + WC)
 	def t_AN(self, token):
-		return self.cw(token, 'A', 'Un' ,'un', 'UN')
+		return self.cw(token, 'un')
 
 	@TOKEN(b'[Aa]u' + WC)
 	def t_AU(self, token):
-		return self.cw(token, 'A', 'Oo' ,'oo', 'OO')
+		return self.cw(token, 'po')
 
 	@TOKEN(b'[Aa]' + WC)
 	def t_A(self, token):
-		return self.cw(token, 'A', 'E' ,'e', 'E')
+		return self.cw(token, 'e')
 
 	@TOKEN(b'en' + NW)
 	def t_EN(self, token):
@@ -123,7 +133,7 @@ class Elex(lex.Lex):
 
 	@TOKEN(b'[Ee]')
 	def t_niw_E(self, token):
-		return self.cw(token, 'E', 'I', 'i', 'I')
+		return self.cw(token, 'i')
 
 	@TOKEN(b'f')
 	def t_inw_F(self, token):
@@ -147,7 +157,7 @@ class Elex(lex.Lex):
 
 	@TOKEN(b'[Oo]')
 	def t_niw_O(self, token):
-		return self.cw(token, 'O', 'Oo', 'oo', 'OO')
+		return self.cw(token, 'oo')
 
 	@TOKEN(b'o')
 	def t_inw_O(self, token):
@@ -155,7 +165,7 @@ class Elex(lex.Lex):
 
 	@TOKEN(b'[Tt]he')
 	def t_THE(self, token):
-		return self.cw(token, 'T', 'Zee', 'zee', 'ZEE')
+		return self.cw(token, 'zee')
 
 	@TOKEN(b'th' + NW)
 	def t_TH(self, token):
@@ -167,15 +177,15 @@ class Elex(lex.Lex):
 
 	@TOKEN(b'[Uu]')
 	def t_inw_U(self, token):
-		return self.cw(token, 'U', 'Oo', 'oo', 'OO')
+		return self.cw(token, 'oo')
 
 	@TOKEN(b'[Vv]')
 	def t_V(self, token):
-		return self.cw(token, 'V', 'F', 'f', 'F')
+		return self.cw(token, 'f')
 
 	@TOKEN(b'[Ww]')
 	def t_W(self, token):
-		return self.cw(token, 'W', 'V', 'v', 'V')
+		return self.cw(token, 'v')
 
 	@TOKEN(b'.')
 	def t_DOT(self, token):
